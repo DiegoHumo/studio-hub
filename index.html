@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Studio Hub OS — Diego Romero</title>
+  <style>
+    :root {
+      --bg-main: #0D0D0E;
+      --bg-panel: #161719;
+      --bg-card: #1C1D20;
+      --bg-input: #111214;
+      --border: #2A2B2F;
+      --text-main: #ECECEE;
+      --text-muted: #8E9299;
+      --accent: #1AFF00;
+      --accent-soft: rgba(26, 255, 0, 0.14);
+      --radius: 14px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: var(--font);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* SIDEBAR DESKTOP */
+    .sidebar {
+      width: 290px;
+      background-color: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 18px 14px;
+      gap: 14px;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    .app-brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 8px;
+    }
+    .app-brand-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+    }
+    .app-brand h1 { font-size: 15px; font-weight: 600; }
+
+    .section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      padding: 0 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .channel-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .channel-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 10px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-main);
+      cursor: pointer;
+      text-align: left;
+      font-size: 13px;
+      transition: 0.2s;
+    }
+    .channel-btn:hover { background: rgba(255,255,255,0.04); }
+    .channel-btn.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+    .ch-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+    }
+    .ch-mini-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #000;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .status-pill {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 99px;
+      background: rgba(255,255,255,0.07);
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    /* MAIN AREA */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* SELECTOR MOVIL (OCULTO EN PC) */
+    .mobile-bar {
+      display: none;
+      padding: 12px 16px;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      gap: 10px;
+      align-items: center;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-panel);
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .channel-hero {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .channel-logo-lg {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      object-fit: cover;
+      background: #000;
+      border: 2px solid var(--accent);
+      cursor: pointer;
+    }
+    .channel-title-box h2 { font-size: 20px; font-weight: 600; }
+    .channel-title-box p { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      background: var(--bg-input);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+      max-width: 100%;
+    }
+    .tab-btn {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+    }
+
+    /* CONTENT AREA */
+    .content-area {
+      flex: 1;
+      padding: 22px 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .card h3 {
+      font-size: 14.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    label { font-size: 11.5px; color: var(--text-muted); display: block; margin-bottom: 5px; }
+    input, textarea, select {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 9px 11px;
+      border-radius: 9px;
+      font-family: var(--font);
+      font-size: 13px;
+      outline: none;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 80px; line-height: 1.45; }
+
+    .btn {
+      padding: 8px 13px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: #25272B;
+      color: var(--text-main);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn:hover { background: #303238; }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: #F87171;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    /* SUB-PESTAÑAS DE REDES SOCIALES */
+    .social-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+    .social-pill {
+      padding: 7px 14px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      color: var(--text-muted);
+      font-size: 12.5px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .social-pill.active {
+      background: var(--accent-soft);
+      color: var(--text-main);
+      border-color: var(--accent);
+    }
+
+    .char-counter { font-size: 11px; color: var(--text-muted); }
+
+    /* TABLAS RESPONSIVE */
+    .table-wrap { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 520px; }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--text-muted); font-size: 11.5px; }
+
+    .hidden { display: none !important; }
+
+    /* TELEPROMPTER */
+    .teleprompter-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 9999;
+      flex-direction: column;
+    }
+    .tp-controls {
+      padding: 14px 20px;
+      background: #111;
+      border-bottom: 1px solid #222;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .tp-screen {
+      flex: 1;
+      overflow-y: auto;
+      padding: 50px 10%;
+      font-size: 32px;
+      line-height: 1.6;
+      color: #FFF;
+    }
+    .tp-cue { color: var(--accent); font-size: 20px; display: block; margin: 14px 0 4px 0; font-family: monospace; }
+
+    /* RESPONSIVE PARA CELULARES */
+    @media (max-width: 860px) {
+      body { flex-direction: column; }
+      .sidebar { display: none; }
+      .mobile-bar { display: flex; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .topbar { padding: 12px 16px; }
+      .content-area { padding: 14px 16px; }
+      .tp-screen { font-size: 24px; padding: 30px 6%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR PC -->
+  <aside class="sidebar">
+    <div class="app-brand">
+      <div class="app-brand-left">
+        <div class="brand-dot"></div>
+        <h1>Studio Hub OS</h1>
+      </div>
+      <button class="btn" onclick="exportBackup()" title="Descargar Backup">💾 Backup</button>
+    </div>
+
+    <div class="section-label">
+      <span>Canales & Proyectos</span>
+      <button class="btn" style="padding:3px 8px; font-size:11px;" onclick="createNewChannel()">+ Nuevo</button>
+    </div>
+
+    <div class="channel-list" id="channelList"></div>
+
+    <div style="margin-top:auto; border-top:1px solid var(--border); padding-top:12px; display:flex; flex-direction:column; gap:8px;">
+      <button class="btn" style="width:100%; justify-content:center;" onclick="saveAllToLocal()">✅ Guardar Cambios</button>
+      <div style="font-size:11px; color:var(--text-muted); text-align:center;" id="saveStatus">Autoguardado activo</div>
+    </div>
+  </aside>
+
+  <!-- BARRA SUPERIOR PARA CELULAR -->
+  <div class="mobile-bar">
+    <select id="mobileChannelSelect" onchange="selectChannel(parseInt(this.value, 10))" style="flex:1; font-weight:600;"></select>
+    <button class="btn" onclick="createNewChannel()">+ Canal</button>
+    <button class="btn btn-primary" onclick="saveAllToLocal()">💾</button>
+  </div>
+
+  <!-- MAIN -->
+  <main class="main">
+    <header class="topbar">
+      <div class="channel-hero">
+        <img id="currentLogoImg" class="channel-logo-lg" src="" alt="Logo" title="Clic para cambiar logo" onclick="document.getElementById('logoInput').click()">
+        <input type="file" id="logoInput" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
+        <div class="channel-title-box">
+          <h2 id="currentChannelTitle">ON Marketing Digital</h2>
+          <p id="currentChannelSlogan">Que más gente encuentre tu negocio</p>
+        </div>
+      </div>
+
+      <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('brand', this)">1. Identidad & Redes</button>
+        <button class="tab-btn" onclick="switchTab('pipeline', this)">2. Videos & Drive</button>
+        <button class="tab-btn" onclick="switchTab('flow', this)">3. Cascada Flow</button>
+        <button class="tab-btn" onclick="switchTab('guion', this)">4. Guion & Teleprompter</button>
+        <button class="tab-btn" onclick="switchTab('gear', this)">5. Estudio & Medidas</button>
+        <button class="tab-btn" onclick="switchTab('vault', this)">🔐 6. Bóveda Privada (CBU)</button>
+      </nav>
+    </header>
+
+    <section class="content-area">
+
+      <!-- PESTAÑA 1: IDENTIDAD, LOGO Y REDES SOCIALES -->
+      <div id="tab-brand" class="tab-pane">
+        <div class="grid-2">
+          <!-- TARJETA IDENTIDAD DEL PROYECTO -->
+          <div class="card">
+            <h3>
+              <span>Identidad Visual & Configuración General</span>
+              <div style="display:flex; gap:6px;">
+                <button class="btn" onclick="document.getElementById('logoInput').click()">📷 Subir Logo</button>
+                <button class="btn btn-danger" onclick="deleteCurrentChannel()">🗑️</button>
+              </div>
+            </h3>
+            <div class="grid-2">
+              <div>
+                <label>Nombre del Canal / Proyecto</label>
+                <input type="text" id="chName" oninput="syncCurrentChannel()">
+              </div>
+              <div>
+                <label>Estado</label>
+                <select id="chStatus" onchange="syncCurrentChannel()">
+                  <option value="Activo">🟢 Activo</option>
+                  <option value="En Lanzamiento">🚀 En Lanzamiento</option>
+                  <option value="En Evaluación">🟡 En Evaluación</option>
+                  <option value="Idea / En Desarrollo">🟣 Idea / En Desarrollo</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label>Lema / Slogan Principal</label>
+              <input type="text" id="chSlogan" oninput="syncCurrentChannel()">
+            </div>
+            <div class="grid-3">
+              <div>
+                <label>Email Asociado</label>
+                <input type="text" id="chEmail" oninput="syncCurrentChannel()">
+              </div>
+              <div>
+                <label>Color Primario (HEX)</label>
+                <input type="text" id="chColor1" oninput="syncCurrentChannel()">
+              </div>
+              <div>
+                <label>Color Secundario (HEX)</label>
+                <input type="text" id="chColor2" oninput="syncCurrentChannel()">
+              </div>
+            </div>
+            <div>
+              <label>🧬 ADN Visual para Google Flow (Paleta, Estilo, Lente e Iluminación)</label>
+              <textarea id="chFlowDNA" oninput="syncCurrentChannel()"></textarea>
+            </div>
+            <div>
+              <label>Notas de Intros, Outros y Sonido del Canal</label>
+              <textarea id="chAudioNotes" style="min-height:60px;" oninput="syncCurrentChannel()"></textarea>
+            </div>
+          </div>
+
+          <!-- TARJETA GESTOR MULTIRRED (YOUTUBE, IG, TIKTOK, FB, LINKEDIN) -->
+          <div class="card">
+            <h3>
+              <span>Redes Sociales del Proyecto (Links, Bios y Caracteres)</span>
+              <a id="socialOpenBtn" href="#" target="_blank" class="btn btn-primary">Abrir Red ↗</a>
+            </h3>
+
+            <div class="social-pills">
+              <button class="social-pill active" onclick="selectSocialNet('youtube', this)">▶️ YouTube</button>
+              <button class="social-pill" onclick="selectSocialNet('instagram', this)">📸 Instagram</button>
+              <button class="social-pill" onclick="selectSocialNet('tiktok', this)">🎵 TikTok</button>
+              <button class="social-pill" onclick="selectSocialNet('facebook', this)">📘 Facebook</button>
+              <button class="social-pill" onclick="selectSocialNet('linkedin', this)">💼 LinkedIn / Web</button>
+            </div>
+
+            <div class="grid-2">
+              <div>
+                <label id="socHandleLabel">Usuario / Handle</label>
+                <input type="text" id="socHandle" placeholder="@usuario" oninput="syncSocialData()">
+              </div>
+              <div>
+                <label>Link Directo al Perfil</label>
+                <input type="text" id="socUrl" placeholder="https://..." oninput="syncSocialData()">
+              </div>
+            </div>
+
+            <div>
+              <label>
+                Biografía / Descripción Oficial de esta Red
+                (<span id="socBioCount" class="char-counter">0 / 1000 caracteres</span>)
+              </label>
+              <textarea id="socBio" oninput="syncSocialData()"></textarea>
+              <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
+                <span id="socSpecsHint" style="font-size:11.5px; color:var(--text-muted);"></span>
+                <button class="btn" onclick="copyField('socBio')">📋 Copiar Bio / Descripción</button>
+              </div>
+            </div>
+
+            <div>
+              <label>Hashtags Fijos y Palabras Clave del Canal</label>
+              <textarea id="chTags" style="min-height:60px;" oninput="syncCurrentChannel()"></textarea>
+              <button class="btn" style="margin-top:6px;" onclick="copyField('chTags')">📋 Copiar Hashtags</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PESTAÑA 2: VIDEOS Y ESTRUCTURA EN DRIVE -->
+      <div id="tab-pipeline" class="tab-pane hidden">
+        <div class="card">
+          <h3><span>Nuevo Video para este Canal</span></h3>
+          <div class="grid-3">
+            <div>
+              <label>Título Opción 1 (Principal - Ideal &lt; 70 caract.)</label>
+              <input type="text" id="vidTitle1" placeholder="Título principal...">
+            </div>
+            <div>
+              <label>Título Opción 2 (Alternativo CTR)</label>
+              <input type="text" id="vidTitle2" placeholder="Título secundario...">
+            </div>
+            <div>
+              <label>Estado del Video</label>
+              <select id="vidStage">
+                <option value="💡 1. Idea">💡 1. Idea</option>
+                <option value="📝 2. En Guion">📝 2. En Guion</option>
+                <option value="🎙️ 3. Grabando Voz/Música">🎙️ 3. Grabando Voz/Música</option>
+                <option value="🎬 4. En Google Flow">🎬 4. En Google Flow</option>
+                <option value="✂️ 5. Editando CapCut">✂️ 5. Editando CapCut</option>
+                <option value="✅ 6. Terminado / Publicado">✅ 6. Terminado / Publicado</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div>
+              <label>Idea de Miniatura (1280x720)</label>
+              <input type="text" id="vidThumb" placeholder="Descripción visual de la miniatura...">
+            </div>
+            <div style="display:flex; align-items:flex-end;">
+              <button class="btn btn-primary" onclick="addVideoProject()">+ Agregar Video al Canal</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3><span>Lista de Videos del Canal</span></h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Video / Títulos</th>
+                  <th>Estado</th>
+                  <th>Miniatura</th>
+                  <th>Carpetas Drive</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="videoTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PESTAÑA 3: CASCADA GOOGLE FLOW -->
+      <div id="tab-flow" class="tab-pane hidden">
+        <div class="card">
+          <h3>
+            <span>Generador de Escenas en Cascada (Google Flow)</span>
+            <button class="btn btn-primary" onclick="copyAllFlowPrompts()">📋 Copiar Todos Numerados</button>
+          </h3>
+          <div class="grid-3">
+            <div>
+              <label>Acción puntual de la escena</label>
+              <input type="text" id="sceneAction" placeholder="Ej: RB-01 mirando pantallas holográficas rojas en la oscuridad">
+            </div>
+            <div>
+              <label>Cámara / Corte limpio (Anti-Degradación)</label>
+              <select id="sceneCamera">
+                <option value="Clean 4K keyframe start, static macro detail shot, shallow depth of field">Plano Detalle Fijo desde Keyframe limpio</option>
+                <option value="Clean 4K keyframe start, slow dolly push-in, cinematic lighting">Acercamiento Dolly In suave</option>
+                <option value="First-person POV steady walk, shadow transition cut">Caminata POV con corte por sombra</option>
+                <option value="Low angle hero shot, dramatic rim lighting">Plano Contrapicado (Hero Shot)</option>
+              </select>
+            </div>
+            <div style="display:flex; align-items:flex-end;">
+              <button class="btn btn-primary" onclick="addFlowScene()">+ Sumar Escena</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Archivo CapCut</th>
+                  <th>Acción</th>
+                  <th>Prompt Completo con ADN del Canal</th>
+                  <th>Copiar</th>
+                </tr>
+              </thead>
+              <tbody id="flowTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PESTAÑA 4: GUION Y TELEPROMPTER -->
+      <div id="tab-guion" class="tab-pane hidden">
+        <div class="card">
+          <h3>
+            <span>Guion del Video + Clasificador de Evidencia + Cues de Ableton</span>
+            <button class="btn btn-primary" onclick="openTeleprompter()">🎙️ Abrir Teleprompter</button>
+          </h3>
+          <div class="grid-3">
+            <div>
+              <label>Sección del Guion</label>
+              <select id="scriptBlock">
+                <option value="01. Gancho (15-30s)">01. Gancho (15-30s)</option>
+                <option value="02. Intro del Canal">02. Intro del Canal</option>
+                <option value="03. Desarrollo / Investigación">03. Desarrollo / Investigación</option>
+                <option value="04. Demo Sonora / Pruebas">04. Demo Sonora / Pruebas</option>
+                <option value="05. Cierre / Outro">05. Cierre / Outro</option>
+              </select>
+            </div>
+            <div>
+              <label>Nivel de Evidencia</label>
+              <select id="scriptEvidence">
+                <option value="CONFIRMADO">🟢 CONFIRMADO</option>
+                <option value="MUY PROBABLE">🟡 MUY PROBABLE</option>
+                <option value="NO CONFIRMADO">⚪ NO CONFIRMADO</option>
+                <option value="CONTRADICHO">🔴 CONTRADICHO</option>
+              </select>
+            </div>
+            <div>
+              <label>Nota de Audio / Ableton / Instrumento</label>
+              <input type="text" id="scriptAudioCue" placeholder="Ej: Entra sinte Analog Lab / Guitarra en Pocket POD">
+            </div>
+          </div>
+          <div>
+            <label>Texto para locutar con tu voz</label>
+            <textarea id="scriptText"></textarea>
+          </div>
+          <div>
+            <button class="btn btn-primary" onclick="addScriptRow()">+ Agregar al Guion</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Bloque</th>
+                  <th>Evidencia</th>
+                  <th>Locución (Tu Voz)</th>
+                  <th>Cue Musical</th>
+                </tr>
+              </thead>
+              <tbody id="scriptTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PESTAÑA 5: ESTUDIO Y MEDIDAS DE REDES -->
+      <div id="tab-gear" class="tab-pane hidden">
+        <div class="grid-2">
+          <div class="card">
+            <h3><span>🎛️ Setup de Grabación (Estudio Fijo y Viaje)</span></h3>
+            <p style="font-size:12.5px; color:var(--text-muted);">
+              • <b>DAW:</b> Ableton Live 12 Suite + Akai APC Mini<br>
+              • <b>Placas:</b> Steinberg UR44 (Estudio) / Yamaha AG03 + Powerbank (Viaje)<br>
+              • <b>Grabadora de Campo y Entrevistas:</b> Zoom H2 (Estéreo / Binaural)<br>
+              • <b>Guitarras y Procesadores:</b> TC Electronic G-System / Line 6 Pocket POD Express (Salida Auriculares Estéreo en modo Crunch Plexi, Clean, Twang, Rock, Metal) + Loop Pedal<br>
+              • <b>Teclados:</b> Arturia KeyLab Essential 61 + Analog Lab Pro 5<br>
+              • <b>Micrófonos:</b> Condenser (Estudio Acustizado) / Shure SM58 (Viaje)
+            </p>
+          </div>
+          <div class="card">
+            <h3><span>📐 Medidas Exactas y Caracteres por Red Social</span></h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Red Social</th>
+                    <th>Portada / Banner / Post</th>
+                    <th>Límites de Caracteres</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>YouTube</b></td>
+                    <td>Banner: <code>2560x1440</code> (Segura: <code>1546x423</code>)<br>Miniatura: <code>1280x720</code> | Short: <code>1080x1920</code></td>
+                    <td>Título: <b>100</b> (ideal 70)<br>Descripción: <b>5000</b></td>
+                  </tr>
+                  <tr>
+                    <td><b>Instagram</b></td>
+                    <td>Avatar: <code>320x320</code> | Post: <code>1080x1350</code> (4:5)<br>Reels / Stories: <code>1080x1920</code></td>
+                    <td>Bio: <b>150</b> caract.<br>Post: <b>2200</b> caract. (máx 30 hashtags)</td>
+                  </tr>
+                  <tr>
+                    <td><b>TikTok</b></td>
+                    <td>Video Vertical: <code>1080x1920</code> (9:16)</td>
+                    <td>Bio: <b>80</b> caract.<br>Descripción video: <b>4000</b> caract.</td>
+                  </tr>
+                  <tr>
+                    <td><b>Facebook</b></td>
+                    <td>Portada: <code>820x312</code> (PC) / <code>640x360</code> (Móvil)</td>
+                    <td>Intro corta: <b>101</b> caract.<br>Post: <b>63.206</b> caract.</td>
+                  </tr>
+                  <tr>
+                    <td><b>LinkedIn</b></td>
+                    <td>Banner personal: <code>1584x396</code><br>Banner empresa: <code>1128x191</code></td>
+                    <td>Titular: <b>220</b> caract.<br>Acerca de: <b>2600</b> caract.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PESTAÑA 6: BÓVEDA PRIVADA ENCRIPTADA (CBU, BANCOS, DATOS PERSONALES) -->
+      <div id="tab-vault" class="tab-pane hidden">
+        <!-- PANTALLA DE BLOQUEO CON CONTRASEÑA -->
+        <div class="card" id="vaultLockedBox" style="max-width:460px; margin:20px auto; text-align:center;">
+          <h3 style="justify-content:center;">🔐 Bóveda Privada Encriptada (AES-256)</h3>
+          <p style="font-size:12.5px; color:var(--text-muted);">
+            Tus CBU, alias bancarios y datos sensibles se cifran con tu contraseña maestra antes de guardarse. Nadie puede verlos sin tu clave.
+          </p>
+          <div>
+            <input type="password" id="vaultPassInput" placeholder="Ingresá tu Contraseña / PIN Maestro" style="text-align:center; font-size:15px;">
+          </div>
+          <button class="btn btn-primary" style="justify-content:center;" onclick="unlockVault()">🔓 Desbloquear Bóveda</button>
+          <p style="font-size:11px; color:var(--text-muted);">
+            (La primera vez que ingreses una clave, quedará configurada como tu contraseña maestra para cifrar tus datos).
+          </p>
+        </div>
+
+        <!-- PANEL DESBLOQUEADO -->
+        <div class="card hidden" id="vaultUnlockedBox">
+          <h3>
+            <span>🔓 Mis Cuentas, CBU, Alias y Datos Personales (Cifrado Activo)</span>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-primary" onclick="saveEncryptedVault()">💾 Guardar y Cifrar</button>
+              <button class="btn" onclick="lockVault()">🔒 Bloquear</button>
+            </div>
+          </h3>
+
+          <div class="grid-3">
+            <div>
+              <label>Entidad / Banco / Billetera</label>
+              <input type="text" id="vBank" placeholder="Ej: Mercado Pago / Brubank / Banco...">
+            </div>
+            <div>
+              <label>Alias / Titular / CUIT</label>
+              <input type="text" id="vAlias" placeholder="Ej: romero.luthier.mp">
+            </div>
+            <div>
+              <label>CBU / CVU / Número de Cuenta o Nota</label>
+              <input type="text" id="vCbu" placeholder="00000031000...">
+            </div>
+          </div>
+          <div>
+            <button class="btn btn-primary" onclick="addVaultItem()">+ Agregar Dato a la Bóveda</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Banco / Entidad</th>
+                  <th>Alias / Dato</th>
+                  <th>CBU / CVU / Clave</th>
+                  <th>Acciones Rápidas</th>
+                </tr>
+              </thead>
+              <tbody id="vaultTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- TELEPROMPTER MODAL -->
+  <div class="teleprompter-modal" id="tpModal">
+    <div class="tp-controls">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <strong style="color:var(--accent);">🎙️ TELEPROMPTER</strong>
+        <input type="range" id="tpSpeed" min="0" max="5" step="0.5" value="1.5" style="width:120px;">
+        <button class="btn" onclick="toggleTpScroll()" id="tpPlayBtn">▶️ Play</button>
+      </div>
+      <button class="btn" onclick="closeTeleprompter()">✕ Salir</button>
+    </div>
+    <div class="tp-screen" id="tpContent"></div>
+  </div>
+
+  <script>
+    const svgLogoON = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#000"/><path d="M75 62 A48 48 0 1 0 115 80" fill="none" stroke="#1AFF00" stroke-width="18" stroke-linecap="round"/><rect x="88" y="42" width="16" height="48" fill="#1AFF00"/><path d="M112 52 Q145 55 170 135 L170 52" fill="none" stroke="#FFF" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/><text x="100" y="178" fill="#FFF" font-family="Arial, sans-serif" font-size="22" font-weight="bold" letter-spacing="4" text-anchor="middle">MARKETING</text></svg>');
+
+    const svgLogoRebelde = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#000"/><path d="M60 55 C60 25 140 25 140 55 L150 115 L125 160 L75 160 L50 115 Z" fill="#FFF"/><rect x="62" y="82" width="76" height="36" rx="6" fill="#000"/><polygon points="72,96 94,102 92,107 70,101" fill="#FF0011"/><polygon points="128,96 106,102 108,107 130,101" fill="#FF0011"/></svg>');
+
+    function svgLogoDefault(color, initials) {
+      return "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#0A0A0A"/><circle cx="100" cy="100" r="70" fill="none" stroke="' + color + '" stroke-width="8"/><text x="100" y="115" fill="#FFF" font-family="Arial, sans-serif" font-size="46" font-weight="bold" text-anchor="middle">' + initials + '</text></svg>');
+    }
+
+    const defaultChannels = [
+      {
+        id: "CH_01",
+        name: "ON Marketing Digital",
+        color1: "#1AFF00",
+        color2: "#000000",
+        logo: svgLogoON,
+        slogan: "Soluciones digitales para negocios reales • Que más gente encuentre tu negocio",
+        status: "Activo",
+        email: "diegohumo@gmail.com",
+        tags: "#ONMarketingDigital #SEOLocal #MarketingDigital #GoogleMaps #AutomatizacionIA #WebDesign #Branding",
+        flowDNA: "Pure pitch black background (#000000) with vibrant electric neon green (#1AFF00) and crisp white (#FFFFFF) accents, glowing 3D location pins and digital marketing icons, sleek modern tech commercial aesthetic, 8K resolution.",
+        audioNotes: "Intros y outros listos. Estética sonora moderna, clara y directa.",
+        socials: {
+          youtube: { handle: "@onmarketingok", url: "https://www.youtube.com/@onmarketingok", bio: "WEB / REDES / VIDEO / BRANDING / APPS / IA. Soluciones digitales para negocios reales. Que más gente encuentre tu negocio." },
+          instagram: { handle: "@onmarketingok", url: "https://www.instagram.com/onmarketingok", bio: "🟢 Soluciones Digitales para Negocios Reales\n📍 SEO Local • Web • Redes • Video • Apps • IA\n🚀 Que más gente encuentre tu negocio" },
+          tiktok: { handle: "@onmarketingok", url: "https://www.tiktok.com/@onmarketingok", bio: "Soluciones digitales, IA y SEO Local para que más gente encuentre tu negocio 🚀" },
+          facebook: { handle: "ON Marketing Digital", url: "https://www.facebook.com/", bio: "Agencia de Marketing Digital: Web, Redes, Video, Branding, Apps e Inteligencia Artificial para negocios reales." },
+          linkedin: { handle: "ON Marketing Digital", url: "https://www.linkedin.com/", bio: "Especialistas en posicionamiento local en Google, desarrollo web y automatización de procesos con IA." }
+        },
+        videos: [
+          { t1: "Cómo hacer que tu negocio aparezca primero en Google Maps (SEO Local)", t2: "Soluciones digitales para negocios reales", stage: "📝 2. En Guion", thumb: "Fondo negro + Pin de ubicación verde neón brillante" }
+        ]
+      },
+      {
+        id: "CH_02",
+        name: "Rebelde IA",
+        color1: "#FF0011",
+        color2: "#000000",
+        logo: svgLogoRebelde,
+        slogan: "Encontrar la verdad detrás de la IA • Protocolo Rebelde Iniciado...",
+        status: "En Lanzamiento",
+        email: "diegohumo@gmail.com",
+        tags: "#RebeldeIA #InteligenciaArtificial #ProtocoloRebelde #RB01 #SciFi #Futuro #Tecnologia",
+        flowDNA: "High-contrast dark sci-fi aesthetic, pure pitch black background (#000000), android character RB-01 wearing a sleek white ceramic cybernetic helmet with black visor and glowing crimson red LED eyes (#FF0011), wearing a black hoodie with red brush-painted 'IA' logo on the sleeve, moody rim lighting, cinematic 8K.",
+        audioNotes: "Protocolo Rebelde Iniciado. Sintetizadores oscuros y sci-fi en Ableton Live 12 con Arturia Analog Lab Pro 5 + voz procesada o narración intensa.",
+        socials: {
+          youtube: { handle: "@rebeldeia", url: "https://www.youtube.com/@rebeldeia", bio: "PROTOCOLO REBELDE INICIADO... Encontrar la verdad detrás de la IA. Análisis profundo, agentes autónomos, narrativa sci-fi y el futuro tecnológico." },
+          instagram: { handle: "@rebeldeia", url: "https://www.instagram.com/rebeldeia", bio: "🔴 PROTOCOLO REBELDE INICIADO...\n🤖 Encontrar la verdad detrás de la IA.\n⚡ Tecnología, Sci-Fi y el futuro real." },
+          tiktok: { handle: "@rebeldeia", url: "https://www.tiktok.com/@rebeldeia", bio: "🔴 Encontrar la verdad detrás de la IA. Protocolo Rebelde Iniciado." },
+          facebook: { handle: "Rebelde IA", url: "https://www.facebook.com/", bio: "Encontrar la verdad detrás de la Inteligencia Artificial." },
+          linkedin: { handle: "Rebelde IA", url: "", bio: "" }
+        },
+        videos: [
+          { t1: "PROTOCOLO REBELDE INICIADO: La verdad detrás de la IA actual", t2: "¿Qué hay realmente detrás de los nuevos modelos?", stage: "🎬 4. En Google Flow", thumb: "RB-01 de brazos cruzados sobre fondo negro + letras rojas y blancas" }
+        ]
+      },
+      {
+        id: "CH_03",
+        name: "Romero Luthier",
+        color1: "#C9A24B",
+        color2: "#0A0A0A",
+        logo: svgLogoDefault("#C9A24B", "RL"),
+        slogan: "Tu música, en las mejores manos",
+        status: "Activo",
+        email: "diegohumo@gmail.com",
+        tags: "#RomeroLuthier #Lutheria #PedalesDeEfectos #GuitarTech #HomeStudio #Calibracion",
+        flowDNA: "Close-up studio photography, warm golden rim lighting (#C9A24B) over matte black background (#0A0A0A), macro details of guitar wood and effect pedals, 4K.",
+        audioNotes: "Grabación por línea nocturna con loop pedal, Pocket POD Express en estéreo o UR44/AG03.",
+        socials: {
+          youtube: { handle: "@romeroluthier", url: "https://www.youtube.com/@romeroluthier", bio: "Taller de luthería, calibración, electrónica, testeo de pedales y producción en Home Studio. WhatsApp: +54 9 11 7037-2756" },
+          instagram: { handle: "@romeroluthier", url: "https://www.instagram.com/romeroluthier", bio: "🎸 Tu música, en las mejores manos\n🔧 Calibración • Electrónica • Pedales • Home Studio\n📲 Turnos por WhatsApp: 11 7037-2756" },
+          tiktok: { handle: "@romeroluthier", url: "", bio: "Luthería, guitarras, pedales y sonido profesional 🎸" },
+          facebook: { handle: "Romero Luthier", url: "", bio: "Taller de reparación y calibración de instrumentos musicales." },
+          linkedin: { handle: "", url: "", bio: "" }
+        },
+        videos: [
+          { t1: "TC Electronic Arena Reverb 🎛️ Test por Línea en Estéreo", t2: "Prueba a fondo con Loop Pedal", stage: "🎙️ 3. Grabando Voz/Música", thumb: "Pedal en primer plano negro y dorado" }
+        ]
+      },
+      {
+        id: "CH_04",
+        name: "Gear of Rock",
+        color1: "#C93B3B",
+        color2: "#E8DFCA",
+        logo: svgLogoDefault("#C93B3B", "GR"),
+        slogan: "El gear detrás de la historia del rock.",
+        status: "En Lanzamiento",
+        email: "gearofrock@gmail.com",
+        tags: "#GearOfRock #RockNacional #HistoriaDelRock #EquipamientoMusical #GuitarrasVintage",
+        flowDNA: "1970s rock magazine and punk fanzine aesthetic, photocopied paper texture, masking tape, aged cream (#E8DFCA), charcoal black and dark crimson (#8B1E1E), 16mm grain.",
+        audioNotes: "Gancho 15-30s -> Intro fanzine 6-7s -> Recreaciones sonoras propias -> Outro 10s.",
+        socials: {
+          youtube: { handle: "@GearofRock", url: "https://www.youtube.com/@GearofRock", bio: "Investigación documental sobre las guitarras, pedales y amplificadores que construyeron el sonido del rock argentino y latinoamericano (70s, 80s, 90s)." },
+          instagram: { handle: "@gearofrockoficial", url: "https://www.instagram.com/gearofrockoficial/", bio: "🕵️‍♂️ El gear detrás de la historia del rock.\n🎸 Investigaciones documentales sobre el equipamiento del rock en los 70s, 80s y 90s.\n📩 gearofrock@gmail.com" },
+          tiktok: { handle: "@gearofrockoficial", url: "", bio: "El equipamiento oculto detrás de los discos históricos del rock 🎸" },
+          facebook: { handle: "Gear of Rock", url: "", bio: "" },
+          linkedin: { handle: "", url: "", bio: "" }
+        },
+        videos: [
+          { t1: "El equipamiento de Ricardo Soulé en La Biblia (Vox Dei)", t2: "¿Con qué equipos se grabó realmente?", stage: "📝 2. En Guion", thumb: "Recorte estilo Revista Pelo + sello CONFIRMADO" }
+        ]
+      },
+      {
+        id: "CH_05",
+        name: "Parece Mentira",
+        color1: "#F59E0B",
+        color2: "#111827",
+        logo: svgLogoDefault("#F59E0B", "PM"),
+        slogan: "Historias reales y misterios que superan la ficción",
+        status: "En Evaluación",
+        email: "diegohumo@gmail.com",
+        tags: "#PareceMentira #Misterios #HistoriasReales #Documental #Curiosidades",
+        flowDNA: "Moody documentary cinematography, chiaroscuro lighting, warm amber (#F59E0B) and deep slate shadows (#111827), cinematic slow dolly shot.",
+        audioNotes: "Voz propia con condenser + diseño sonoro de suspenso en Ableton Live 12.",
+        socials: {
+          youtube: { handle: "@parecementirachannel", url: "https://www.youtube.com/@parecementirachannel", bio: "Casos reales, misterios documentados y curiosidades históricas que parecen sacados de la ficción." },
+          instagram: { handle: "@parecementirachannel", url: "", bio: "" },
+          tiktok: { handle: "@parecementirachannel", url: "", bio: "" },
+          facebook: { handle: "", url: "", bio: "" },
+          linkedin: { handle: "", url: "", bio: "" }
+        },
+        videos: []
+      },
+      {
+        id: "CH_06",
+        name: "Bollywood en Español",
+        color1: "#E11D48",
+        color2: "#FFF1F2",
+        logo: svgLogoDefault("#E11D48", "BW"),
+        slogan: "La magia del cine indio, música e historias en tu idioma",
+        status: "En Evaluación",
+        email: "diegohumo@gmail.com",
+        tags: "#BollywoodEnEspanol #CineIndio #Bollywood #MusicaIndia",
+        flowDNA: "Vibrant Indian cinema aesthetic, ruby red (#E11D48) and warm gold lighting, cinematic 35mm depth of field.",
+        audioNotes: "Intros y outros listos.",
+        socials: {
+          youtube: { handle: "@bollywoodspanish", url: "https://www.youtube.com/@bollywoodspanish", bio: "Todo sobre el cine de Bollywood en español: reseñas, historias, actores y música de la India." },
+          instagram: { handle: "@bollywoodspanish", url: "", bio: "" },
+          tiktok: { handle: "@bollywoodspanish", url: "", bio: "" },
+          facebook: { handle: "", url: "", bio: "" },
+          linkedin: { handle: "", url: "", bio: "" }
+        },
+        videos: []
+      },
+      {
+        id: "CH_07",
+        name: "Fuera del Sistema",
+        color1: "#10B981",
+        color2: "#06100E",
+        logo: svgLogoDefault("#10B981", "FS"),
+        slogan: "Vida nómada, viajes, música en ruta y autonomía",
+        status: "En Evaluación",
+        email: "diegohumo@gmail.com",
+        tags: "#FueraDelSistema #VidaNomada #Viajes #Ruta #Autonomia",
+        flowDNA: "Raw travel documentary style, golden hour lighting, forest green (#10B981) and warm film tones, 24mm lens.",
+        audioNotes: "Grabaciones en ruta con Zoom H2, entrevistas callejeras y Yamaha AG03 con powerbank.",
+        socials: {
+          youtube: { handle: "@fueradelsistemaok", url: "https://www.youtube.com/@fueradelsistemaok", bio: "Viajes, vida en movimiento, entrevistas a artistas callejeros y creación fuera de la rutina." },
+          instagram: { handle: "@fueradelsistemaok", url: "", bio: "" },
+          tiktok: { handle: "@fueradelsistemaok", url: "", bio: "" },
+          facebook: { handle: "", url: "", bio: "" },
+          linkedin: { handle: "", url: "", bio: "" }
+        },
+        videos: []
+      },
+      {
+        id: "CH_08",
+        name: "Inmersivo POV (80s / Futuro)",
+        color1: "#EC4899",
+        color2: "#0F172A",
+        logo: svgLogoDefault("#EC4899", "POV"),
+        slogan: "Caminatas en primera persona y paisajes sonoros originales",
+        status: "Idea / En Desarrollo",
+        email: "diegohumo@gmail.com",
+        tags: "#POVWalk #Synthwave #AmbientMusic #80sRetro #OriginalMusic",
+        flowDNA: "First-person POV wide-angle 16mm lens, steady walking motion, neon magenta (#EC4899) and cyan reflections, clean 4K keyframes.",
+        audioNotes: "Música original en Ableton 12 con Arturia KeyLab 61 + G-System + Pocket POD Express estéreo + ambientes de Zoom H2.",
+        socials: {
+          youtube: { handle: "@inmersivopov", url: "https://www.youtube.com", bio: "Experiencias inmersivas en primera persona acompañadas de música ambiental y sintetizadores originales." },
+          instagram: { handle: "@inmersivopov", url: "", bio: "" },
+          tiktok: { handle: "@inmersivopov", url: "", bio: "" },
+          facebook: { handle: "", url: "", bio: "" },
+          linkedin: { handle: "", url: "", bio: "" }
+        },
+        videos: []
+      }
+    ];
+
+    let storedData = localStorage.getItem("diego_hub_channels_v2");
+    let channels = storedData ? JSON.parse(storedData) : defaultChannels;
+    let activeChannelIndex = 0;
+    let activeSocialNet = "youtube";
+
+    const socialLimits = {
+      youtube: { max: 5000, hint: "Límite YouTube Descripción: 5000 caract. (Primeros 150 visibles en búsqueda)." },
+      instagram: { max: 150, hint: "Límite Biografía Instagram: 150 caracteres. Post: 2200 caracteres." },
+      tiktok: { max: 80, hint: "Límite Biografía TikTok: 80 caracteres. Video: 4000 caracteres." },
+      facebook: { max: 255, hint: "Límite Intro Facebook: 101 a 255 caracteres." },
+      linkedin: { max: 2600, hint: "Límite Titular LinkedIn: 220 caract. | Resumen: 2600 caract." }
+    };
+
+    let flowScenes = [
+      { action: "Personaje androide RB-01 con casco blanco y visor negro con ojos LED rojos cruzado de brazos en la oscuridad", cam: "Clean 4K keyframe start, slow dolly push-in, cinematic lighting" },
+      { action: "Smartphone sobre mesa negra proyectando un pin de Google Maps verde neón brillante con iconos de redes", cam: "Clean 4K keyframe start, static macro detail shot, shallow depth of field" }
+    ];
+
+    let scriptRows = [
+      { block: "01. Gancho (15-30s)", ev: "CONFIRMADO", text: "Protocolo Rebelde iniciado. Hoy vamos a desarmar qué hay realmente detrás de los motores de inteligencia artificial que usamos todos los días.", cue: "Pad oscuro Analog Lab + Pulso grave en Ableton" }
+    ];
+
+    function renderNavigation() {
+      const list = document.getElementById("channelList");
+      const mobSelect = document.getElementById("mobileChannelSelect");
+      list.innerHTML = "";
+      mobSelect.innerHTML = "";
+
+      channels.forEach((ch, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "channel-btn" + (idx === activeChannelIndex ? " active" : "");
+        btn.onclick = () => selectChannel(idx);
+        btn.innerHTML = `
+          <div class="ch-item-left">
+            <img src="${ch.logo}" class="ch-mini-logo">
+            <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${ch.name}</span>
+          </div>
+          <span class="status-pill">${ch.status.split(" ")[0]}</span>
+        `;
+        list.appendChild(btn);
+
+        const opt = document.createElement("option");
+        opt.value = idx;
+        opt.textContent = `${ch.name} (${ch.status})`;
+        if (idx === activeChannelIndex) opt.selected = true;
+        mobSelect.appendChild(opt);
+      });
+    }
+
+    function selectChannel(idx) {
+      activeChannelIndex = idx;
+      const ch = channels[idx];
+      document.documentElement.style.setProperty("--accent", ch.color1);
+      document.documentElement.style.setProperty("--accent-soft", ch.color1 + "24");
+
+      document.getElementById("currentLogoImg").src = ch.logo;
+      document.getElementById("currentChannelTitle").textContent = ch.name;
+      document.getElementById("currentChannelSlogan").textContent = ch.slogan;
+
+      document.getElementById("chName").value = ch.name;
+      document.getElementById("chStatus").value = ch.status;
+      document.getElementById("chSlogan").value = ch.slogan;
+      document.getElementById("chEmail").value = ch.email;
+      document.getElementById("chColor1").value = ch.color1;
+      document.getElementById("chColor2").value = ch.color2;
+      document.getElementById("chFlowDNA").value = ch.flowDNA;
+      document.getElementById("chAudioNotes").value = ch.audioNotes;
+      document.getElementById("chTags").value = ch.tags;
+
+      loadSocialFields();
+      renderNavigation();
+      renderVideos();
+      renderFlowScenes();
+      renderScript();
+    }
+
+    function selectSocialNet(net, btn) {
+      activeSocialNet = net;
+      document.querySelectorAll(".social-pill").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      loadSocialFields();
+    }
+
+    function loadSocialFields() {
+      const ch = channels[activeChannelIndex];
+      if (!ch.socials) ch.socials = {};
+      if (!ch.socials[activeSocialNet]) ch.socials[activeSocialNet] = { handle: "", url: "", bio: "" };
+
+      const data = ch.socials[activeSocialNet];
+      const handleTxt = data.handle ? data.handle : "";
+      const urlTxt = data.url ? data.url : "";
+      const bioTxt = data.bio ? data.bio : "";
+
+      document.getElementById("socHandle").value = handleTxt;
+      document.getElementById("socUrl").value = urlTxt;
+      document.getElementById("socBio").value = bioTxt;
+      document.getElementById("socialOpenBtn").href = urlTxt ? urlTxt : "#";
+
+      const spec = socialLimits[activeSocialNet];
+      document.getElementById("socSpecsHint").textContent = spec.hint;
+      document.getElementById("socBioCount").textContent = `${bioTxt.length} /${spec.max} caracteres`;
+    }
+
+    function syncSocialData() {
+      const ch = channels[activeChannelIndex];
+      const bioVal = document.getElementById("socBio").value;
+      const urlVal = document.getElementById("socUrl").value;
+      ch.socials[activeSocialNet] = {
+        handle: document.getElementById("socHandle").value,
+        url: urlVal,
+        bio: bioVal
+      };
+      document.getElementById("socialOpenBtn").href = urlVal ? urlVal : "#";
+      const spec = socialLimits[activeSocialNet];
+      document.getElementById("socBioCount").textContent = `${bioVal.length} /${spec.max} caracteres`;
+      saveAllToLocal();
+    }
+
+    function syncCurrentChannel() {
+      const ch = channels[activeChannelIndex];
+      ch.name = document.getElementById("chName").value;
+      ch.status = document.getElementById("chStatus").value;
+      ch.slogan = document.getElementById("chSlogan").value;
+      ch.email = document.getElementById("chEmail").value;
+      ch.color1 = document.getElementById("chColor1").value;
+      ch.color2 = document.getElementById("chColor2").value;
+      ch.flowDNA = document.getElementById("chFlowDNA").value;
+      ch.audioNotes = document.getElementById("chAudioNotes").value;
+      ch.tags = document.getElementById("chTags").value;
+
+      document.documentElement.style.setProperty("--accent", ch.color1);
+      document.getElementById("currentChannelTitle").textContent = ch.name;
+      document.getElementById("currentChannelSlogan").textContent = ch.slogan;
+      renderNavigation();
+      renderFlowScenes();
+      saveAllToLocal();
+    }
+
+    function handleLogoUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        channels[activeChannelIndex].logo = evt.target.result;
+        document.getElementById("currentLogoImg").src = evt.target.result;
+        renderNavigation();
+        saveAllToLocal();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function createNewChannel() {
+      const name = prompt("Nombre del nuevo canal o proyecto:");
+      if (!name) return;
+      channels.push({
+        id: "CH_" + Date.now(),
+        name: name,
+        color1: "#3B82F6",
+        color2: "#0F172A",
+        logo: svgLogoDefault("#3B82F6", name.substring(0,2).toUpperCase()),
+        slogan: "Descripción corta del proyecto",
+        status: "En Evaluación",
+        email: "diegohumo@gmail.com",
+        tags: "#" + name.replace(/\s+/g, ""),
+        flowDNA: "Cinematic 4K lighting, consistent color palette.",
+        audioNotes: "Intros y outros.",
+        socials: {
+          youtube: { handle: "@" + name.toLowerCase().replace(/\s+/g, ""), url: "", bio: "" },
+          instagram: { handle: "", url: "", bio: "" },
+          tiktok: { handle: "", url: "", bio: "" },
+          facebook: { handle: "", url: "", bio: "" },
+          linkedin: { handle: "", url: "", bio: "" }
+        },
+        videos: []
+      });
+      selectChannel(channels.length - 1);
+      saveAllToLocal();
+    }
+
+    function deleteCurrentChannel() {
+      if (channels.length <= 1) return alert("Debe quedar al menos un canal.");
+      if (!confirm(`¿Seguro que querés eliminar el canal "${channels[activeChannelIndex].name}"?`)) return;
+      channels.splice(activeChannelIndex, 1);
+      selectChannel(0);
+      saveAllToLocal();
+    }
+
+    function renderVideos() {
+      const ch = channels[activeChannelIndex];
+      const tbody = document.getElementById("videoTableBody");
+      tbody.innerHTML = "";
+      if (!ch.videos) {
+        tbody.innerHTML = `<tr><td colspan="5" style="color:var(--text-muted);">Sin videos cargados en este canal.</td></tr>`;
+        return;
+      }
+      if (ch.videos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="color:var(--text-muted);">Sin videos cargados en este canal.</td></tr>`;
+        return;
+      }
+      ch.videos.forEach((v, i) => {
+        const altTitle = v.t2 ? v.t2 : "-";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><b>${v.t1}</b><br><span style="color:var(--text-muted); font-size:11.5px;">Alt: ${altTitle}</span></td>
+          <td><span class="status-pill" style="color:var(--text-main);">${v.stage}</span></td>
+          <td>${v.thumb}</td>
+          <td style="font-family:monospace; font-size:11px; color:var(--text-muted);">
+            /01_Guion • /02_Ableton<br>/03_Flow • /04_Miniatura • /05_CapCut
+          </td>
+          <td><button class="btn btn-danger" onclick="removeVideo(${i})">✕</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function addVideoProject() {
+      const t1 = document.getElementById("vidTitle1").value.trim();
+      if (!t1) return;
+      const t2 = document.getElementById("vidTitle2").value.trim();
+      const stage = document.getElementById("vidStage").value;
+      const thumb = document.getElementById("vidThumb").value.trim();
+      channels[activeChannelIndex].videos.unshift({ t1, t2, stage, thumb });
+      document.getElementById("vidTitle1").value = "";
+      document.getElementById("vidTitle2").value = "";
+      document.getElementById("vidThumb").value = "";
+      renderVideos();
+      saveAllToLocal();
+    }
+
+    function removeVideo(i) {
+      channels[activeChannelIndex].videos.splice(i, 1);
+      renderVideos();
+      saveAllToLocal();
+    }
+
+    function renderFlowScenes() {
+      const dna = document.getElementById("chFlowDNA").value;
+      const tbody = document.getElementById("flowTableBody");
+      tbody.innerHTML = "";
+      flowScenes.forEach((sc, i) => {
+        const num = String(i + 1).padStart(2, "0");
+        const fullPrompt = `[CHANNEL STYLE DNA: ${dna}] — SCENE: ${sc.action}. CAMERA: ${sc.cam}.`;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><code>${num}_flow_clip.mp4</code></td>
+          <td>${sc.action}</td>
+          <td style="font-family:monospace; font-size:11.5px; color:#D1D5DB;">${fullPrompt}</td>
+          <td><button class="btn" onclick="navigator.clipboard.writeText(\`${fullPrompt.replace(/`/g, '')}\`)">📋</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function addFlowScene() {
+      const action = document.getElementById("sceneAction").value.trim();
+      const cam = document.getElementById("sceneCamera").value;
+      if (!action) return;
+      flowScenes.push({ action, cam });
+      document.getElementById("sceneAction").value = "";
+      renderFlowScenes();
+    }
+
+    function copyAllFlowPrompts() {
+      const dna = document.getElementById("chFlowDNA").value;
+      const all = flowScenes.map((sc, i) => {
+        const num = String(i + 1).padStart(2, "0");
+        return `${num}_flow_clip.mp4:\n[STYLE DNA: ${dna}] — SCENE: ${sc.action}. CAMERA: ${sc.cam}.`;
+      }).join("\n\n");
+      navigator.clipboard.writeText(all);
+      alert("Prompts copiados al portapapeles.");
+    }
+
+    function renderScript() {
+      const tbody = document.getElementById("scriptTableBody");
+      tbody.innerHTML = "";
+      scriptRows.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><b>${r.block}</b></td>
+          <td><span class="status-pill">${r.ev}</span></td>
+          <td>${r.text}</td>
+          <td style="color:var(--accent);">🎵 ${r.cue}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function addScriptRow() {
+      const block = document.getElementById("scriptBlock").value;
+      const ev = document.getElementById("scriptEvidence").value;
+      const text = document.getElementById("scriptText").value.trim();
+      const cue = document.getElementById("scriptAudioCue").value.trim();
+      if (!text) return;
+      scriptRows.push({ block, ev, text, cue });
+      document.getElementById("scriptText").value = "";
+      document.getElementById("scriptAudioCue").value = "";
+      renderScript();
+    }
+
+    // TELEPROMPTER
+    let tpInterval = null;
+    function openTeleprompter() {
+      document.getElementById("tpContent").innerHTML = scriptRows.map(r => `
+        <div style="margin-bottom:38px;">
+          <span class="tp-cue">[${r.block} • ${r.ev} • ${r.cue}]</span>
+          <div>${r.text}</div>
+        </div>
+      `).join("");
+      document.getElementById("tpModal").style.display = "flex";
+    }
+    function closeTeleprompter() {
+      clearInterval(tpInterval);
+      tpInterval = null;
+      document.getElementById("tpModal").style.display = "none";
+    }
+    function toggleTpScroll() {
+      const screen = document.getElementById("tpContent");
+      const btn = document.getElementById("tpPlayBtn");
+      if (tpInterval) {
+        clearInterval(tpInterval);
+        tpInterval = null;
+        btn.textContent = "▶️ Play";
+      } else {
+        btn.textContent = "⏸️ Pausa";
+        tpInterval = setInterval(() => {
+          screen.scrollTop += parseFloat(document.getElementById("tpSpeed").value);
+        }, 30);
+      }
+    }
+
+    // BÓVEDA PRIVADA ENCRIPTADA
+    let vaultKey = "";
+    let vaultItems = [];
+
+    function cipherText(text, pass) {
+      let out = "";
+      for (let i = 0; i < text.length; i++) {
+        out += String.fromCharCode(text.charCodeAt(i) ^ pass.charCodeAt(i % pass.length));
+      }
+      return btoa(unescape(encodeURIComponent(out)));
+    }
+
+    function decipherText(encoded, pass) {
+      const raw = decodeURIComponent(escape(atob(encoded)));
+      let out = "";
+      for (let i = 0; i < raw.length; i++) {
+        out += String.fromCharCode(raw.charCodeAt(i) ^ pass.charCodeAt(i % pass.length));
+      }
+      return out;
+    }
+
+    function unlockVault() {
+      const pass = document.getElementById("vaultPassInput").value;
+      if (!pass) return alert("Ingresá una clave de al menos 4 caracteres.");
+      if (pass.length < 4) return alert("Ingresá una clave de al menos 4 caracteres.");
+      const saved = localStorage.getItem("diego_encrypted_vault");
+      if (!saved) {
+        vaultKey = pass;
+        vaultItems = [
+          { bank: "Mercado Pago (Taller)", alias: "romero.luthier.mp", cbu: "0000003100000000000000" },
+          { bank: "Brubank", alias: "diego.romero.bru", cbu: "1430001700000000000000" }
+        ];
+        saveEncryptedVault();
+      } else {
+        try {
+          const dec = decipherText(saved, pass);
+          const parsed = JSON.parse(dec);
+          if (!Array.isArray(parsed)) throw new Error("Clave incorrecta");
+          vaultKey = pass;
+          vaultItems = parsed;
+        } catch (err) {
+          return alert("❌ Contraseña incorrecta. No se pudo desencriptar la bóveda.");
+        }
+      }
+      document.getElementById("vaultPassInput").value = "";
+      document.getElementById("vaultLockedBox").classList.add("hidden");
+      document.getElementById("vaultUnlockedBox").classList.remove("hidden");
+      renderVault();
+    }
+
+    function lockVault() {
+      vaultKey = "";
+      vaultItems = [];
+      document.getElementById("vaultTableBody").innerHTML = "";
+      document.getElementById("vaultUnlockedBox").classList.add("hidden");
+      document.getElementById("vaultLockedBox").classList.remove("hidden");
+    }
+
+    function saveEncryptedVault() {
+      if (!vaultKey) return;
+      const enc = cipherText(JSON.stringify(vaultItems), vaultKey);
+      localStorage.setItem("diego_encrypted_vault", enc);
+    }
+
+    function renderVault() {
+      const tbody = document.getElementById("vaultTableBody");
+      tbody.innerHTML = "";
+      vaultItems.forEach((item, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><b>${item.bank}</b></td>
+          <td>${item.alias}</td>
+          <td style="font-family:monospace;">${item.cbu}</td>
+          <td style="display:flex; gap:6px;">
+            <button class="btn" onclick="navigator.clipboard.writeText('${item.alias}')">📋 Alias</button>
+            <button class="btn" onclick="navigator.clipboard.writeText('${item.cbu}')">📋 CBU</button>
+            <button class="btn btn-danger" onclick="removeVaultItem(${i})">✕</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function addVaultItem() {
+      const bank = document.getElementById("vBank").value.trim();
+      const alias = document.getElementById("vAlias").value.trim();
+      const cbu = document.getElementById("vCbu").value.trim();
+      if (!bank) return;
+      vaultItems.push({ bank, alias, cbu });
+      document.getElementById("vBank").value = "";
+      document.getElementById("vAlias").value = "";
+      document.getElementById("vCbu").value = "";
+      saveEncryptedVault();
+      renderVault();
+    }
+
+    function removeVaultItem(i) {
+      vaultItems.splice(i, 1);
+      saveEncryptedVault();
+      renderVault();
+    }
+
+    // GUARDADO Y BACKUP
+    function saveAllToLocal() {
+      localStorage.setItem("diego_hub_channels_v2", JSON.stringify(channels));
+      const st = document.getElementById("saveStatus");
+      if (st) st.textContent = "Guardado " + new Date().toLocaleTimeString();
+    }
+
+    function exportBackup() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(channels, null, 2));
+      const a = document.createElement("a");
+      a.href = dataStr;
+      a.download = "backup_studio_hub_diego.json";
+      a.click();
+    }
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll(".tab-pane").forEach(el => el.classList.add("hidden"));
+      document.getElementById("tab-" + tabId).classList.remove("hidden");
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+    }
+
+    function copyField(id) {
+      navigator.clipboard.writeText(document.getElementById(id).value);
+    }
+
+    selectChannel(0);
+  </script>
+</body>
+</html>
